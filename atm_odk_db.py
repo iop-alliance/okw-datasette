@@ -112,11 +112,11 @@ def run_script(tool):
                         except IndexError:
                             break
                 
-                __file_name = "./bin/" + str(__project_id) + "_"+ __form_id
+                __file_name = "./db/" + str(__project_id) + "_"+ __form_id
                 __merged.to_csv(__file_name + ".csv")
 
                 __options = csq.CsvOptions(typing_style="full", encoding="UTF-8")
-                csq.write_csv([__file_name], __file_name +".sqlite", __options)
+                csq.write_csv([__file_name + ".csv"], __file_name +".sqlite", __options)
 
             print("Successfully written csv and sqlite files")
             
