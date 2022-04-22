@@ -2,11 +2,12 @@ import requests
 import json
 from zipfile import ZipFile
 from io import BytesIO, StringIO
-import ray
-import modin.pandas as pd
+import pandas as pd
 import sys
 import csv_to_sqlite as csq
+import datetime
 
+__now = str(datetime.datetime.now())
 
 
 print("The Internet of Production Alliance.\n This program downloads form submissions from ODK central and saves the data in CSV and SQLITE formats.")
@@ -79,6 +80,34 @@ def extract_zip_inram(zipped_file):
     __read_zip = ZipFile(BytesIO(zipped_file))
     return {__file: __read_zip.read(__file) for __file in __read_zip.namelist()}
 
+__json_config = open('config/delete.json')
+
+config =  {
+"__csv": "db/2_GCC_Field_Ready_Form_v3.1.csv",
+
+"__delete": json.load(__json_config),
+
+"__clean" : ["group_db44n52-", "manufacturing_facility-", "facility_status-", "location"],
+
+"__merge" : [(None,None),(None,None)],
+}
+
+
+def db_treatment(dataframe, clean_this, delete_that, merge_them):
+    for __str in delete_that['columns']:
+        for __column in dataframe.columns:
+            if __str in __column:
+                print("deleted " + str(__column))
+                dataframe = dataframe.drop(columns=[__column])
+    
+    for __str in clean_this:
+        for __column in dataframe.columns:
+            dataframe = dataframe.rename({__column: __column.replace(__str, "")}, axis='columns')
+    
+    return dataframe
+
+
+
 def run_script(tool):
     if tool == "datasette":
         __token = get_odk_token(__url,__email,__password)
@@ -112,11 +141,14 @@ def run_script(tool):
                         except IndexError:
                             break
                 
-                __file_name = "./db/" + str(__project_id) + "_"+ __form_id
-                __merged.to_csv(__file_name + ".csv")
+                        __file_name = "./db/" + str(__project_id) + "_"+ __form_id + "_" + __now
 
-                __options = csq.CsvOptions(typing_style="full", encoding="UTF-8")
-                csq.write_csv([__file_name + ".csv"], __file_name +".sqlite", __options)
+                        __cleaned = db_treatment(__merged, config['__clean'], config['__delete'], None)
+
+                        __cleaned.to_csv(__file_name + ".csv")
+
+                        __options = csq.CsvOptions(typing_style="full", encoding="UTF-8")
+                        csq.write_csv([__file_name + ".csv"], __file_name +".sqlite", __options)
 
             print("Successfully written csv and sqlite files")
             
@@ -125,7 +157,6 @@ def run_script(tool):
 
 
 if __name__ == "__main__":
-    ray.init()
     if not run_script("datasette"):
         sys.exit()
 
