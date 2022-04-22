@@ -1,4 +1,4 @@
-{"columns": 
+{"columns":
     [
 	"start",
 	"end",
@@ -29,6 +29,11 @@
 	"AttachmentsPresent",
 	"AttachmentsExpected",
 	"DeviceID",
-	"Edits"
+	"Edits",
+  	"postcode",
+  	"address",
+  	"Wikipedia_URL_of_the_machine",
+  	"Wikipedia_URL_of_the_anufacturing_process",
+  	"Please_provide_the_serial_number"
 	]
 }
