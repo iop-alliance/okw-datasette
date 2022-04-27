@@ -33,19 +33,23 @@ try:
         for _file in __files:
             if _file[-4:] == ".csv":
                 print("#"*60)
-                print("\nFile(s): " + _file + "\n")
+                print("\n\tFile(s): " + _file + "\n")
                 print("#"*60)
                 print("\n")
-                if not csq.write_csv([_file], _file + ".sqlite", options):
+                _file_spl = _file.split("/")
+                _file_name = _file[:-4] + ".sqlite"
+                _file_rnm = _file_spl[0] + "/" + _file_spl[1].title()[:-4] + ".sqlite"
+                if not csq.write_csv([_file], _file_rnm, options):
                     print("\n")
                     print("#"*60)
                     print("\n\t**No valid File. Or sqlite file/table already exist.")
                     print("\n\t**Fix by deleting old sqlite files in the CSV file location\n")
                     print("#"*60)
             else:
-                print("Invalid FILE use CSV file")
+                print("\n\tInvalid FILE use CSV file")
     else:
-        print("\n**No file provided\nUse: okw_csv_sqlite.py database.csv\n")
+        print("#"*60)
+        print("\n\t**No file provided\n\tUse: okw_csv_sqlite.py database.csv\n")
 
 except ModuleNotFoundError:
     print("\n**Error Execute: pip install csv_to_sqlite\n" )
